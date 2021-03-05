@@ -1,7 +1,8 @@
 import React, { useEffect } from "react";
 import { useRecoilValue, useRecoilState } from "recoil";
-import { postListState, messageState } from "./recoil/ChatState";
+import { postListState, messageState, PostState } from "./recoil/ChatState";
 import { API, graphqlOperation } from "aws-amplify";
+import { GraphQLResult } from "@aws-amplify/api";
 import { listPostsSortedByCreatedAt } from "./graphql/queries";
 import { createPost } from "./graphql/mutations";
 import { onCreatePost } from "./graphql/subscriptions";
@@ -10,18 +11,30 @@ import ListItem from "@material-ui/core/ListItem";
 import Chip from "@material-ui/core/Chip";
 import Button from "@material-ui/core/Button";
 import TextField from "@material-ui/core/TextField";
-import { makeStyles } from "@material-ui/core/styles";
+import { createStyles, Theme, makeStyles } from "@material-ui/core/styles";
+import Container from "@material-ui/core/Container";
+import { CreatePostMutation, ListPostsSortedByCreatedAtQuery } from "./API";
 
-const useStyles = makeStyles({
-  myMessage: {
-    display: "flex",
-    justifyContent: "flex-start",
-  },
-  otherMessage: {
-    display: "flex",
-    justifyContent: "flex-end",
-  },
-});
+const useStyles = makeStyles((theme: Theme) =>
+  createStyles({
+    container: {
+      paddingTop: theme.spacing(10),
+      paddingBottom: theme.spacing(10),
+      backgroundColor: "white",
+    },
+    input: {
+      display: "flex",
+    },
+    myMessage: {
+      display: "flex",
+      justifyContent: "flex-start",
+    },
+    otherMessage: {
+      display: "flex",
+      justifyContent: "flex-end",
+    },
+  })
+);
 
 interface ContentProps {
   userName?: string;
@@ -37,13 +50,14 @@ const Content = (props: ContentProps) => {
   };
 
   const postPost = async () => {
-    const post = await API.graphql(
+    const post = (await API.graphql(
       graphqlOperation(createPost, {
         input: { message: message, owner: "chat", user: props.userName },
       })
-    );
-    //@ts-ignore
-    setPosts([...posts, post.data.createPost]);
+    )) as GraphQLResult<CreatePostMutation>;
+    const ppp = post.data?.createPost as PostState;
+    setPosts([...posts, ppp]);
+    setMessage("");
   };
 
   const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -52,17 +66,17 @@ const Content = (props: ContentProps) => {
 
   useEffect(() => {
     async function getPosts() {
-      const res = await API.graphql(
+      const res = (await API.graphql(
         graphqlOperation(listPostsSortedByCreatedAt, { owner: "chat" })
-      );
-      //@ts-ignore
-      setPosts(res.data.listPostsSortedByCreatedAt.items);
+      )) as GraphQLResult<ListPostsSortedByCreatedAtQuery>;
+      const ppp = res?.data?.listPostsSortedByCreatedAt?.items as PostState[];
+      setPosts(ppp);
     }
     getPosts();
   }, [setPosts]);
 
   useEffect(() => {
-    //@ts-ignore
+    // @ts-ignore
     const subscription = API.graphql(graphqlOperation(onCreatePost)).subscribe({
       next: (eventData: any) => {
         console.log("next");
@@ -94,13 +108,15 @@ const Content = (props: ContentProps) => {
   }
 
   return (
-    <>
-      <TextField value={message} onChange={handleChange} />
-      <Button variant="contained" color="secondary" onClick={handleClick}>
-        登録する
-      </Button>
+    <Container maxWidth="lg" className={classes.container}>
+      <div className={classes.input}>
+        <TextField value={message} onChange={handleChange} />
+        <Button variant="contained" color="secondary" onClick={handleClick}>
+          登録する
+        </Button>
+      </div>
       <List>{postList}</List>
-    </>
+    </Container>
   );
 };
 

@@ -1,7 +1,7 @@
 import { atom, selector, DefaultValue, RecoilState } from "recoil";
 import produce from "immer";
 
-interface PostState {
+export interface PostState {
   id: string;
   message: string;
   owner: string;
