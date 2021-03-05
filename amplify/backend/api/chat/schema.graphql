@@ -1,0 +1,13 @@
+type Post
+  @model
+  @key(
+    name: "SortByCreatedAt"
+    fields: ["owner", "createdAt"]
+    queryField: "listPostsSortedByCreatedAt"
+  ) {
+  id: ID!
+  message: String!
+  owner: String
+  user: String
+  createdAt: AWSDateTime
+}
