@@ -55,8 +55,8 @@ const Content = (props: ContentProps) => {
         input: { message: message, owner: "chat", user: props.userName },
       })
     )) as GraphQLResult<CreatePostMutation>;
-    const ppp = post.data?.createPost as PostState;
-    setPosts([...posts, ppp]);
+    const postData = post.data?.createPost as PostState;
+    setPosts([...posts, postData]);
     setMessage("");
   };
 
@@ -69,8 +69,9 @@ const Content = (props: ContentProps) => {
       const res = (await API.graphql(
         graphqlOperation(listPostsSortedByCreatedAt, { owner: "chat" })
       )) as GraphQLResult<ListPostsSortedByCreatedAtQuery>;
-      const ppp = res?.data?.listPostsSortedByCreatedAt?.items as PostState[];
-      setPosts(ppp);
+      const postData = res?.data?.listPostsSortedByCreatedAt
+        ?.items as PostState[];
+      setPosts(postData);
     }
     getPosts();
   }, [setPosts]);
@@ -79,7 +80,6 @@ const Content = (props: ContentProps) => {
     // @ts-ignore
     const subscription = API.graphql(graphqlOperation(onCreatePost)).subscribe({
       next: (eventData: any) => {
-        console.log("next");
         const post = eventData.value.data.onCreatePost;
         if (post !== undefined && post.user !== props.userName) {
           setPosts([...posts, post]);

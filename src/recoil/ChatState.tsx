@@ -24,7 +24,6 @@ export const postState = atom({
   default: defaultValue,
 });
 
-// TODO: 後でちゃんと理解する
 export const messageState: RecoilState<string> = (() => {
   const propName: keyof PostState = "message";
   return selector<string>({
