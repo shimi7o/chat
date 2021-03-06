@@ -8,7 +8,7 @@ import {
 } from "@aws-amplify/ui-components";
 import awsconfig from "./aws-exports";
 import Content from "./Content";
-import { RecoilRoot, useSetRecoilState } from "recoil";
+import { RecoilRoot } from "recoil";
 import { createStyles, Theme, makeStyles } from "@material-ui/core/styles";
 import AppBar from "@material-ui/core/AppBar";
 import Toolbar from "@material-ui/core/Toolbar";
