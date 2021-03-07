@@ -1,2 +1,1 @@
-# サンプルチャットアプリ
-GraphQL、Recoilの勉強用に作成したサンプルチャットアプリ
+React+Amplify+AppSync+TypeScript+Recoilで作る認証機能つきチャットアプリ
